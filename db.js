@@ -1,4 +1,6 @@
 const pg = require("pg");
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 require('dotenv').config();
 const pool = new pg.Pool(
     {
@@ -10,4 +12,17 @@ const pool = new pg.Pool(
     }
 );
 
-module.exports = pool;
+module.exports = { 
+    addUser: async function (userdata) {
+        const {email, first, last, password} = userdata;
+        const hash = await bcrypt.hash(password, saltRounds)
+        await pool.query(
+            'INSERT INTO users (username, firstname, lastname, hash, membership) VALUES ($1, $2, $3, $4, $5)',
+            [email, first, last, hash, false]
+        );
+    },
+    available : async function(username) {
+        const { rows } = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+        return rows.length === 0;
+    }
+}

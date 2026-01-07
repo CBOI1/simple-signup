@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="http://localhost:3000/" method="POST">
+    <form action="/register" method="POST">
         <div>
             <label for="first">First Name:</label>
             <input type="text" id="first" name="first" required>
@@ -20,13 +20,14 @@
             <input type="text" id="email" name="email" required>
         </div>
         <div>
-            <label for=""></label>
-            <input type="text">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password">
         </div>
         <div>
-            <label for=""></label>
-            <input type="text">
+            <label for="confirmation">Confirmation:</label>
+            <input type="password" id="confirmation" name="confirmation">
         </div>
+        <button type="submit">Submit</button>
     </form>
 </body>
 </html>
