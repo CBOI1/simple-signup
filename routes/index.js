@@ -10,7 +10,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 
 router.get('/', (req, res) => {
-    res.send('<p>Hello</p>');
+    res.render('index', {isAuthenticated: req.isAuthenticated.bind(req)});
 });
 
 router.get('/register', (req, res) => {
@@ -36,14 +36,14 @@ passport.use(new LocalStrategy(async (username, password, done) => {
     try {
         const user = await db.getUser(username)
         if (!user) {
-            done(null, fals, {message: "Invalid email"});
+            done(null, false, {message: "Invalid email"});
         }
         const validPassword = await bcrypt.compare(password, user.hash);
         if (!validPassword) {
             return done(null, false, {message: "Incorrect password."})
         }
         return done(null, user)
-    } catch {
+    } catch(err) {
         done(err);
     }
 }));
