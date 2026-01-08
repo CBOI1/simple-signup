@@ -14,7 +14,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 //parser
 app.use(express.urlencoded({extended: true}));
-//adding session support and authentication
+//adding session management and session authentication
 app.use(session({secret: "cats", resave: false, saveUninitialized: false }));
 app.use(passport.session());
 app.use(router);

@@ -13,6 +13,7 @@ const pool = new pg.Pool(
 );
 
 module.exports = { 
+    saltRounds : saltRounds,
     addUser: async function (userdata) {
         const {email, first, last, password} = userdata;
         const hash = await bcrypt.hash(password, saltRounds)
@@ -24,5 +25,9 @@ module.exports = {
     available : async function(username) {
         const { rows } = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
         return rows.length === 0;
+    },
+    getUser : async function(username) {
+        const { rows } = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+        return rows[0];
     }
 }
