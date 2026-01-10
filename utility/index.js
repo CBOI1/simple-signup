@@ -2,7 +2,7 @@ const { body } = require("express-validator")
 const db = require('./../db.js');
 const { error } = require("console");
 const MIN_PASSWORD_LEN = 8;
-module.exports.registerValidator = () =>  {
+module.exports.register = () =>  {
     return [
     body('first').trim().notEmpty().escape(), 
     body('last').trim().notEmpty().escape(), 
@@ -23,12 +23,19 @@ module.exports.registerValidator = () =>  {
         }
     )
     ];
-}
+};
 
-module.exports.loginValidator = () => {
+module.exports.login = () => {
     return [
         body('username').trim().isEmail().toLowerCase(),
         body('password').notEmpty().isLength({min: MIN_PASSWORD_LEN})
         .withMessage(`Password must be at least ${MIN_PASSWORD_LEN} characters long.`)
     ]
-}
+};
+
+module.exports.createMessage = () => {
+    return [
+        body('title').trim().notEmpty().toLowerCase(),
+        body('text').trim().notEmpty()
+    ]
+};

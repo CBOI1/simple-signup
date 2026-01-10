@@ -5,7 +5,7 @@ const { Strategy } = require('passport-local');
 const path = require('path');
 const db = require(path.join(__dirname, '..', 'db.js'));
 const router = express.Router();
-const {registerValidator, loginValidator} = require(path.join(__dirname, '..', 'utility'));
+const validate = require(path.join(__dirname, '..', 'utility'));
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 
@@ -17,7 +17,7 @@ router.get('/register', (req, res) => {
     res.render('register');
 })
 
-router.post('/register', registerValidator(), async (req, res) => {
+router.post('/register', validate.register() , async (req, res) => {
     const result = validationResult(req);
     if (!result.isEmpty()) {
         return res.send(result.array());
@@ -29,6 +29,26 @@ router.post('/register', registerValidator(), async (req, res) => {
 router.get('/login', (req, res) => {
     res.render('login');
 });
+
+//authenticate user when logging in
+router.post(
+    '/login', 
+    validate.login(),
+    passport.authenticate('local', {failureRedirect: '/login', successRedirect: '/'})
+);
+
+
+router.get('/create', (req, res) => {
+    res.render('create', {isAuthenticated: req.isAuthenticated.bind(req)});
+});
+
+router.post('/create', 
+    validate.createMessage(),
+    async (req, res) => {
+        await db.addPost(req.user.username, req.body.title, req.body.text);
+        res.redirect('/');
+    }
+);
 
 //register and configure strategy
 passport.use(new LocalStrategy(async (username, password, done) => {
@@ -56,12 +76,6 @@ passport.deserializeUser((user, done) => {
     done(null, user);
 })
 
-//authenticate user when logging in
-router.post(
-    '/login', 
-    loginValidator(),
-    passport.authenticate('local', {failureRedirect: '/login', successRedirect: '/'})
-);
 
 
 

@@ -29,5 +29,11 @@ module.exports = {
     getUser : async function(username) {
         const { rows } = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
         return rows[0];
+    },
+    addPost: async (username, title, text) => {
+        await pool.query(
+            'INSERT INTO posts(username, ts, title, text) VALUES ($1, $2, $3, $4)', 
+            [username.toLowerCase(), new Date(), title, text]
+        );
     }
 }
