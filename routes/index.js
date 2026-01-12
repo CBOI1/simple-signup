@@ -1,16 +1,44 @@
 const express = require('express');
 const { matchedData, validationResult, body } = require('express-validator');
 const passport = require('passport');
-const { Strategy } = require('passport-local');
 const path = require('path');
 const db = require(path.join(__dirname, '..', 'db.js'));
 const router = express.Router();
 const validate = require(path.join(__dirname, '..', 'utility'));
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
+const { format } = require('date-fns');
 
-router.get('/', (req, res) => {
-    res.render('index', {isAuthenticated: req.isAuthenticated.bind(req)});
+
+function capitalize(word) {
+    const temp = word.trim();
+    return temp.charAt(0).toUpperCase() + temp.substring(1).toLowerCase();
+}
+
+function processPosts(posts) {
+    const result = []
+    for (const post of posts) {
+        const title = post.title.trim().split(" ").filter((word) => word !== "").map(capitalize).join(" ");
+        const fullname = capitalize(post.first) + " " + capitalize(post.last);
+        const date = format(new Date(post.ts), 'MMMM dd, yyyy');
+        const text = post.text;
+        result.push({fullname, title, date, text});
+    }
+    return result
+}
+
+router.get('/', async (req, res) => {
+    const posts = await db.getMessages()
+    res.
+    render
+    ( 
+        'index', 
+        {
+            isAuthenticated: req.isAuthenticated.bind(req), 
+            posts: processPosts(posts),
+            isMember: () => req.user && req.user.isMember
+        }
+    );
 });
 
 router.get('/register', (req, res) => {
@@ -45,7 +73,7 @@ router.get('/create', (req, res) => {
 router.post('/create', 
     validate.createMessage(),
     async (req, res) => {
-        await db.addPost(req.user.username, req.body.title, req.body.text);
+        await db.addPost(req.user, req.body.title, req.body.text);
         res.redirect('/');
     }
 );

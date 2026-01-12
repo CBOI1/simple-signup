@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Message</title>
+</head>
+<body>
+    <% if (locals.isAuthenticated && locals.isAuthenticated()) { %>
+        <form action="/create" method="POST">
+            <div>
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div>
+                <label for="text"></label>
+                <textarea name="text" id="text" maxlength="1000" wrap="hard" cols="40" rows="40" required></textarea>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    <% } %>
+</body>
+</html>

@@ -30,10 +30,13 @@ module.exports = {
         const { rows } = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
         return rows[0];
     },
-    addPost: async (username, title, text) => {
+    addPost: async (user, title, text) => {
         await pool.query(
-            'INSERT INTO posts(username, ts, title, text) VALUES ($1, $2, $3, $4)', 
-            [username.toLowerCase(), new Date(), title, text]
+            'INSERT INTO posts(username, first, last, ts, title, text) VALUES ($1, $2, $3, $4, $5, $6)', 
+            [user.username, user.firstname, user.lastname, new Date(), title, text]
         );
+    },
+    getMessages : async () => {
+        return (await pool.query('SELECT * FROM posts')).rows;
     }
 }
