@@ -13,21 +13,38 @@
             border: 1px solid black;
             width: 20rem;
             padding: 1rem;
+            border-radius: 1rem;
+            background-color: white;
+           
         }
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
+             background-color: beige;
         }
+
     </style>
 </head>
 <body>
     <header>
         <nav>
-            <li><a href="/login">login</a></li>
-            <li><a href="/register">register</a></li>
-            <% if (locals.isAuthenticated && isAuthenticated()) { %>
+            <% if (!locals.isAuthenticated || !isAuthenticated()) { %>
+                <li><a href="/login">login</a></li>
+                <li><a href="/register">register</a></li>
+            <% } else { %>
                 <li><a href="/create">create message</a></li>
+                <li>
+                    <form action="/logout" method="POST">
+                        <button type="submit" id="logout-btn">logout</button>
+                    </form>
+                </li>
+                <% if (locals.isMember && !locals.isMember()) { %>
+                    <li>
+                        <a href="/become-member">become a member</a>
+                    </form>
+                    </li>
+                <% } %>
             <% } %>
         </nav>
     </header>

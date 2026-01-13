@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
         {
             isAuthenticated: req.isAuthenticated.bind(req), 
             posts: processPosts(posts),
-            isMember: () => req.user && req.user.isMember
+            isMember: () => req.user && req.user.membership
         }
     );
 });
@@ -78,13 +78,41 @@ router.post('/create',
     }
 );
 
+router.post('/logout', (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        res.redirect('/');
+    });
+});
+
+router.get('/become-member', async (req, res) => {
+    res.render('member');
+});
+
+router.post('/become-member', async (req, res) => {
+    if (req.user && req.body.password === process.env.MEMBER_PASSWORD) {
+        await db.becomeMember(req.user.username);
+        return res.redirect('/');
+    } else {
+        res.redirect('/become-member');
+    }
+})
+
+
+/*
+router.get('become-member', (req, res) => {
+});
+*/
+
 //register and configure strategy
 passport.use(new LocalStrategy(async (username, password, done) => {
     //check if username exists in db
     try {
         const user = await db.getUser(username)
         if (!user) {
-            done(null, false, {message: "Invalid email"});
+            return done(null, false, {message: "Invalid email"});
         }
         const validPassword = await bcrypt.compare(password, user.hash);
         if (!validPassword) {
@@ -97,11 +125,12 @@ passport.use(new LocalStrategy(async (username, password, done) => {
 }));
 
 passport.serializeUser((user, done) => {
-    done(null, user);
+    done(null, user.username);
 })
 
-passport.deserializeUser((user, done) => {
-    done(null, user);
+passport.deserializeUser(async (username, done) => {
+    const user = await db.getUser(username);
+    return done(null, user);
 })
 
 

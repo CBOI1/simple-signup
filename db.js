@@ -37,6 +37,9 @@ module.exports = {
         );
     },
     getMessages : async () => {
-        return (await pool.query('SELECT * FROM posts')).rows;
+        return (await pool.query('SELECT * FROM posts')).rows;t
+    },
+    becomeMember : async (username) => {
+        await pool.query('UPDATE users SET membership = TRUE WHERE username = $1', [username]);
     }
 }
